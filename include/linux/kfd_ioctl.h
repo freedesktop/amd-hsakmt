@@ -171,6 +171,32 @@ struct kfd_ioctl_reset_event_args {
 	uint32_t pad;
 };
 
+struct kfd_memory_exception_failure {
+	uint32_t NotPresent;	/* Page not present or supervisor privilege */
+	uint32_t ReadOnly;	/* Write access to a read-only page */
+	uint32_t NoExecute;	/* Execute access to a page marked NX */
+	uint32_t pad;
+};
+
+/* memory exception data*/
+struct kfd_hsa_memory_exception_data {
+	struct kfd_memory_exception_failure failure;
+	uint64_t va;
+	uint32_t gpu_id;
+	uint32_t pad;
+};
+
+/* Event data*/
+struct kfd_event_data {
+	union {
+		struct kfd_hsa_memory_exception_data memory_exception_data;
+	};				/* From KFD */
+	uint64_t kfd_event_data_ext;	/* pointer to an extension structure
+					   for future exception types */
+	uint32_t event_id;		/* to KFD */
+	uint32_t pad;
+};
+
 struct kfd_ioctl_wait_events_args {
 	uint64_t events_ptr;		/* to KFD */
 	uint32_t num_events;		/* to KFD */

@@ -30,7 +30,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include <sys/mman.h>
-#include "linux/kfd_ioctl.h"
+#include "kfd_ioctl.h"
 
 static HSAuint64 *events_page = NULL;
 

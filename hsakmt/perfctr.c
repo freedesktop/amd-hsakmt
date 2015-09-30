@@ -26,7 +26,7 @@
 #include <stdlib.h>
 #include "libhsakmt.h"
 #include "pmc_table.h"
-#include "linux/kfd_ioctl.h"
+#include "kfd_ioctl.h"
 #include <unistd.h>
 
 #define BITS_PER_BYTE                   CHAR_BIT

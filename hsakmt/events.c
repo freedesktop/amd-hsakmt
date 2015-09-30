@@ -49,6 +49,9 @@ hsaKmtCreateEvent(
     HsaEvent**          Event                   //OUT
     )
 {
+	HsaEvent *e;
+	struct kfd_ioctl_create_event_args args;
+
 	CHECK_KFD_OPEN();
 
 	if (EventDesc->EventType >= HSA_EVENTTYPE_MAXID)
@@ -56,7 +59,7 @@ hsaKmtCreateEvent(
 		return HSAKMT_STATUS_INVALID_PARAMETER;
 	}
 
-	HsaEvent* e = malloc(sizeof(HsaEvent));
+	e = malloc(sizeof(HsaEvent));
 	if (e == NULL)
 	{
 		return HSAKMT_STATUS_ERROR;
@@ -64,7 +67,6 @@ hsaKmtCreateEvent(
 
 	memset(e, 0, sizeof(*e));
 
-	struct kfd_ioctl_create_event_args args;
 	memset(&args, 0, sizeof(args));
 
 	args.event_type = EventDesc->EventType;
@@ -113,12 +115,13 @@ hsaKmtDestroyEvent(
     HsaEvent*   Event    //IN
     )
 {
+	struct kfd_ioctl_destroy_event_args args;
+
 	CHECK_KFD_OPEN();
 
 	if (!Event)
 		return HSAKMT_STATUS_INVALID_HANDLE;
 
-	struct kfd_ioctl_destroy_event_args args;
 	memset(&args, 0, sizeof(args));
 
 	args.event_id = Event->EventId;
@@ -138,6 +141,8 @@ hsaKmtSetEvent(
     HsaEvent*  Event    //IN
     )
 {
+	struct kfd_ioctl_set_event_args args;
+
 	CHECK_KFD_OPEN();
 
 	if (!Event)
@@ -147,7 +152,6 @@ hsaKmtSetEvent(
 	if (IsSystemEventType(Event->EventData.EventType))
 		return HSAKMT_STATUS_ERROR;
 
-	struct kfd_ioctl_set_event_args args;
 	memset(&args, 0, sizeof(args));
 
 	args.event_id = Event->EventId;
@@ -164,6 +168,8 @@ hsaKmtResetEvent(
     HsaEvent*  Event    //IN
     )
 {
+	struct kfd_ioctl_reset_event_args args;
+
 	CHECK_KFD_OPEN();
 
 	if (!Event)
@@ -173,7 +179,6 @@ hsaKmtResetEvent(
 	if (IsSystemEventType(Event->EventData.EventType))
 		return HSAKMT_STATUS_ERROR;
 
-	struct kfd_ioctl_reset_event_args args;
 	memset(&args, 0, sizeof(args));
 
 	args.event_id = Event->EventId;
@@ -220,26 +225,27 @@ hsaKmtWaitOnMultipleEvents(
     HSAuint32   Milliseconds    //IN
     )
 {
+	HSAKMT_STATUS result;
+	struct kfd_event_data *event_data;
+	struct kfd_ioctl_wait_events_args args;
+
 	CHECK_KFD_OPEN();
 
 	if (!Events)
 		return HSAKMT_STATUS_INVALID_HANDLE;
 
-	struct kfd_event_data *event_data = malloc(NumEvents * sizeof(struct kfd_event_data));
+	event_data = malloc(NumEvents * sizeof(struct kfd_event_data));
 	for (HSAuint32 i = 0; i < NumEvents; i++) {
 		event_data[i].event_id = Events[i]->EventId;
 		event_data[i].kfd_event_data_ext = (uint64_t)(uintptr_t)NULL;
 	}
 
-	struct kfd_ioctl_wait_events_args args;
 	memset(&args, 0, sizeof(args));
 
 	args.wait_for_all = WaitOnAll;
 	args.timeout = Milliseconds;
 	args.num_events = NumEvents;
 	args.events_ptr = (uint64_t)(uintptr_t)event_data;
-
-	HSAKMT_STATUS result;
 
 	if (kmtIoctl(kfd_fd, AMDKFD_IOC_WAIT_EVENTS, &args) == -1) {
 		result = HSAKMT_STATUS_ERROR;

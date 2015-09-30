@@ -46,6 +46,8 @@ hsaKmtSetMemoryPolicy(
 {
 	HSAKMT_STATUS result;
 	uint32_t gpu_id;
+	struct kfd_ioctl_set_memory_policy_args args;
+	int err;
 
 	CHECK_KFD_OPEN();
 
@@ -63,7 +65,6 @@ hsaKmtSetMemoryPolicy(
 	CHECK_PAGE_MULTIPLE(MemoryAddressAlternate);
 	CHECK_PAGE_MULTIPLE(MemorySizeInBytes);
 
-	struct kfd_ioctl_set_memory_policy_args args;
 	memset(&args, 0, sizeof(args));
 
 	args.gpu_id = gpu_id;
@@ -72,7 +73,7 @@ hsaKmtSetMemoryPolicy(
 	args.alternate_aperture_base = (uintptr_t)MemoryAddressAlternate;
 	args.alternate_aperture_size = MemorySizeInBytes;
 
-	int err = kmtIoctl(kfd_fd, AMDKFD_IOC_SET_MEMORY_POLICY, &args);
+	err = kmtIoctl(kfd_fd, AMDKFD_IOC_SET_MEMORY_POLICY, &args);
 
 	return (err == -1) ? HSAKMT_STATUS_ERROR : HSAKMT_STATUS_SUCCESS;
 }
@@ -98,17 +99,19 @@ hsaKmtAllocMemory(
     void**          MemoryAddress           //OUT (page-aligned)
     )
 {
-	CHECK_KFD_OPEN();
 	HSAKMT_STATUS result;
 	uint32_t gpu_id;
 	int err;
+	HSAuint64 page_size;
+
+	CHECK_KFD_OPEN();
 
 	result = validate_nodeid(PreferredNode, &gpu_id);
 	if (result != HSAKMT_STATUS_SUCCESS)
 		return result;
 
 	// The required size should be page aligned (GDS?)
-	HSAuint64 page_size = PageSizeFromFlags(MemFlags.ui32.PageSize);
+	page_size = PageSizeFromFlags(MemFlags.ui32.PageSize);
 	if ((SizeInBytes & (page_size-1)) && !MemFlags.ui32.GDSMemory){
 		return HSAKMT_STATUS_INVALID_PARAMETER;
 	}

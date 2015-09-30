@@ -195,18 +195,20 @@ hsaKmtCreateQueue(
 	struct device_info *dev_info;
 	int err;
 	void* ptr;
+	struct queue *q;
+	struct kfd_ioctl_create_queue_args args;
+
 	CHECK_KFD_OPEN();
 
 	result = validate_nodeid(NodeId, &gpu_id);
 	if (result != HSAKMT_STATUS_SUCCESS)
 		return result;
 
-	struct queue *q = malloc(sizeof(struct queue));
+	q = malloc(sizeof(struct queue));
 	if (q == NULL)
 		return HSAKMT_STATUS_NO_MEMORY;
 	memset(q, 0, sizeof(*q));
 
-	struct kfd_ioctl_create_queue_args args;
 	memset(&args, 0, sizeof(args));
 
 	dev_id = get_device_id_by_node(NodeId);
@@ -289,6 +291,7 @@ hsaKmtUpdateQueue(
 {
 	struct kfd_ioctl_update_queue_args arg;
 	struct queue *q = PORT_UINT64_TO_VPTR(QueueId);
+	int err;
 
 	CHECK_KFD_OPEN();
 
@@ -300,7 +303,7 @@ hsaKmtUpdateQueue(
 	arg.queue_percentage = QueuePercentage;
 	arg.queue_priority = Priority;
 
-	int err = kmtIoctl(kfd_fd, AMDKFD_IOC_UPDATE_QUEUE, &arg);
+	err = kmtIoctl(kfd_fd, AMDKFD_IOC_UPDATE_QUEUE, &arg);
 	if (err == -1)
 	{
 		return HSAKMT_STATUS_ERROR;
@@ -315,10 +318,13 @@ hsaKmtDestroyQueue(
     HSA_QUEUEID         QueueId         //IN
     )
 {
+	int err;
+	struct queue *q;
+	struct kfd_ioctl_destroy_queue_args args;
+
 	CHECK_KFD_OPEN();
 
-	struct queue *q = PORT_UINT64_TO_VPTR(QueueId);
-	struct kfd_ioctl_destroy_queue_args args;
+	q = PORT_UINT64_TO_VPTR(QueueId);
 
 	if (q == NULL)
 			return (HSAKMT_STATUS_INVALID_PARAMETER);
@@ -327,7 +333,7 @@ hsaKmtDestroyQueue(
 
 	args.queue_id = q->queue_id;
 
-	int err = kmtIoctl(kfd_fd, AMDKFD_IOC_DESTROY_QUEUE, &args);
+	err = kmtIoctl(kfd_fd, AMDKFD_IOC_DESTROY_QUEUE, &args);
 
 	if (err == -1)
 	{

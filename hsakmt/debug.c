@@ -36,16 +36,17 @@ hsaKmtDbgRegister(
 {
 	HSAKMT_STATUS result;
 	uint32_t gpu_id;
+	struct kfd_ioctl_dbg_register_args args;
+	long err;
 	CHECK_KFD_OPEN();
 
 	result = validate_nodeid(NodeId, &gpu_id);
 	if (result != HSAKMT_STATUS_SUCCESS)
 		return result;
 
-	struct kfd_ioctl_dbg_register_args args;
 	memset(&args, 0, sizeof(args));
 	args.gpu_id = gpu_id;
-	long  err = kmtIoctl(kfd_fd, AMDKFD_IOC_DBG_REGISTER, &args);
+	err = kmtIoctl(kfd_fd, AMDKFD_IOC_DBG_REGISTER, &args);
 
 	if (err == 0)
 		result = HSAKMT_STATUS_SUCCESS;
@@ -63,16 +64,17 @@ hsaKmtDbgUnregister(
 {
 	HSAKMT_STATUS result;
 	uint32_t gpu_id;
+	struct kfd_ioctl_dbg_unregister_args args;
+	long err;
 	CHECK_KFD_OPEN();
 
 	result = validate_nodeid(NodeId, &gpu_id);
 	if (result != HSAKMT_STATUS_SUCCESS)
 		return result;
 
-	struct kfd_ioctl_dbg_unregister_args args;
 	memset(&args, 0, sizeof(args));
 	args.gpu_id = gpu_id;
-	long  err = kmtIoctl(kfd_fd, AMDKFD_IOC_DBG_UNREGISTER, &args);
+	err = kmtIoctl(kfd_fd, AMDKFD_IOC_DBG_UNREGISTER, &args);
 	if (err == 0)
 		result = HSAKMT_STATUS_SUCCESS;
 	else
@@ -93,7 +95,9 @@ hsaKmtDbgWavefrontControl(
 {
 	HSAKMT_STATUS result;
 	uint32_t gpu_id;
-
+	uint32_t buff_size;
+	unsigned char *run_ptr;
+	long err;
 	struct kfd_ioctl_dbg_wave_control_args *args;
 
 	CHECK_KFD_OPEN();
@@ -103,11 +107,11 @@ hsaKmtDbgWavefrontControl(
 		return result;
 
 	/* Determine Size  of the ioctl buffer */
-	uint32_t buff_size = sizeof(Operand) +
-				sizeof(Mode) + sizeof(TrapId) +
-				sizeof(DbgWaveMsgRing->DbgWaveMsg) +
-				sizeof(DbgWaveMsgRing->MemoryVA) +
-				sizeof(*args);
+	buff_size = sizeof(Operand) +
+		    sizeof(Mode) + sizeof(TrapId) +
+		    sizeof(DbgWaveMsgRing->DbgWaveMsg) +
+		    sizeof(DbgWaveMsgRing->MemoryVA) +
+		    sizeof(*args);
 
 	args = (struct kfd_ioctl_dbg_wave_control_args*) malloc(buff_size);
 	if (args == NULL)
@@ -119,7 +123,7 @@ hsaKmtDbgWavefrontControl(
 	args->buf_size_in_bytes = buff_size;
 
 	/* increment pointer to the start of the non fixed part */
-	unsigned char* run_ptr = (unsigned char*)args + sizeof(*args);
+	run_ptr = (unsigned char*)args + sizeof(*args);
 
 	/* save variable content pointer for kfd */
 	args->content_ptr = (uint64_t) run_ptr;
@@ -141,7 +145,7 @@ hsaKmtDbgWavefrontControl(
 	run_ptr += sizeof(DbgWaveMsgRing->MemoryVA);
 
 	/* send to kernel */
-	long err = kmtIoctl(kfd_fd, AMDKFD_IOC_DBG_WAVE_CONTROL, args);
+	err = kmtIoctl(kfd_fd, AMDKFD_IOC_DBG_WAVE_CONTROL, args);
 
 	free (args);
 
@@ -168,6 +172,8 @@ hsaKmtDbgAddressWatch(
 	uint32_t buff_size;
 	uint32_t watch_mask_items, watch_event_items;
 	HSAuint32 i;
+	unsigned char *run_ptr;
+	long err;
 
 	/*
 	 * Determine the size of the watch mask and event buffers
@@ -208,7 +214,7 @@ hsaKmtDbgAddressWatch(
 	args->buf_size_in_bytes = buff_size;
 
 	/* increment pointer to the start of the non fixed part */
-	unsigned char* run_ptr = (unsigned char*)args + sizeof(*args);
+	run_ptr = (unsigned char*)args + sizeof(*args);
 
 	/* save variable content pointer for kfd */
 	args->content_ptr = (uint64_t) run_ptr;
@@ -238,7 +244,7 @@ hsaKmtDbgAddressWatch(
 	}
 
 	/* send to kernel */
-	long err = kmtIoctl(kfd_fd, AMDKFD_IOC_DBG_ADDRESS_WATCH, args);
+	err = kmtIoctl(kfd_fd, AMDKFD_IOC_DBG_ADDRESS_WATCH, args);
 
 	free (args);
 

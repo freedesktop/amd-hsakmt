@@ -34,9 +34,10 @@ hsaKmtGetVersion(
     HsaVersionInfo*  VersionInfo    //OUT
     )
 {
+	struct kfd_ioctl_get_version_args args;
+
 	CHECK_KFD_OPEN();
 
-	struct kfd_ioctl_get_version_args args;
 	memset(&args, 0, sizeof(args));
 
 	if (kmtIoctl(kfd_fd, AMDKFD_IOC_GET_VERSION, &args) == -1)

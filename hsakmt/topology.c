@@ -743,9 +743,9 @@ HSAKMT_STATUS
 HSAKMTAPI
 hsaKmtReleaseSystemProperties(void)
 {
-	CHECK_KFD_OPEN();
-
 	HSAKMT_STATUS err;
+
+	CHECK_KFD_OPEN();
 
 	pthread_mutex_lock(&hsakmt_mutex);
 
@@ -955,17 +955,19 @@ uint16_t get_device_id_by_node(HSAuint32 node_id)
 static int get_cpu_stepping(uint16_t* stepping)
 {
 	int ret;
+	char *p, *read_buf;
+	int read_size;
 	FILE* fd = fopen("/proc/cpuinfo", "r");
 	if (!fd)
 		return -1;
 
-	char* read_buf = malloc(PAGE_SIZE);
+	read_buf = malloc(PAGE_SIZE);
 	if (!read_buf) {
 		ret = -1;
 		goto err1;
 	}
 
-	int read_size = fread(read_buf, 1, PAGE_SIZE, fd);
+	read_size = fread(read_buf, 1, PAGE_SIZE, fd);
 	if (read_size <= 0) {
 		ret = -2;
 		goto err2;
@@ -978,7 +980,7 @@ static int get_cpu_stepping(uint16_t* stepping)
 
 	*stepping = 0;
 
-	char* p = strstr(read_buf, "stepping");
+	p = strstr(read_buf, "stepping");
 	if (p)
 		sscanf(p , "stepping\t: %hu\n", stepping);
 

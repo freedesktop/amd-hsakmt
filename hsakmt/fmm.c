@@ -213,12 +213,14 @@ static bool aperture_is_valid(void* app_base, void* app_limit){
 /*
  * Assumes that fmm_mutex is locked on entry.
  */
-static int aperture_release(manageble_aperture_t* app, void* address, uint64_t MemorySizeInBytes){
-	int rc = -1;
+static int aperture_release(manageble_aperture_t* app, void* address, uint64_t MemorySizeInBytes)
+{
+	vm_object_t* object;
 	vm_area_t* area;
+	int rc = -1;
 
 	area = vm_find(app, address);
-	vm_object_t* object = vm_find_object_by_address(app, address, MemorySizeInBytes);
+	object = vm_find_object_by_address(app, address, MemorySizeInBytes);
 	if (object && area){
 		vm_remove_object(app, object);
 		if (VOID_PTRS_SUB(area->end, area->start) + 1 > MemorySizeInBytes){ // the size of the released block is less than the size of area

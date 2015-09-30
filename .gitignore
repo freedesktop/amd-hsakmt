@@ -1,10 +1,30 @@
 .*
+patches-*
+build/
+outgoing/
+Makefile
+Makefile.in
+aclocal.m4
+autom4te.cache/
+compile
+config.guess
+config.h
+config.h.in
+config.log
+config.status
+config.sub
+configure
+depcomp
+hsakmt-1-uninstalled.pc
+hsakmt-1.pc
+install-sh
+libtool
+ltmain.sh
+missing
+stamp-h1
 
 #
 # git files that we don't want to ignore even it they are dot-files
 #
 !.gitignore
 !.mailmap
-patches-*
-build/
-outgoing/

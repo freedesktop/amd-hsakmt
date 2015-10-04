@@ -27,6 +27,7 @@
 #define LIBHSAKMT_H_INCLUDED
 
 #include "hsakmt.h"
+#include "hsakmt-version.h"
 #include <pthread.h>
 #include <stdint.h>
 #include <limits.h>

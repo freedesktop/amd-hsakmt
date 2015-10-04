@@ -260,11 +260,14 @@ fi
 
 AC_MSG_RESULT($support_for_pthreads)
 
+# distribute additional compiler and linker flags among Makefiles
+# --> set and change these variables instead of CXXFLAGS or LDFLAGS (for user only)
 AC_SUBST(TOOLCHAIN_SUPPORTS__THREAD)
 AC_SUBST(HAVE_PTHREADS)
 AC_SUBST(PTHREAD_LDFLAGS)
 AC_SUBST(PTHREAD_LIBS)
 AC_SUBST(PTHREAD_CFLAGS)
+AC_SUBST(AM_CFLAGS)
 
 # Checks for library functions.
 

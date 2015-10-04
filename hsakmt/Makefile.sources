@@ -17,9 +17,9 @@ libhsakmt_sources =			\
 
 libhsakmt_headers =			\
 	fmm.h				\
+	libhsakmt.h			\
+	pmc_table.h			\
 	hsakmt.h			\
 	hsakmttypes.h			\
 	kfd_ioctl.h			\
-	libhsakmt.h			\
-	pmc_table.h			\
 	$(NULL)

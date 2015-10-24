@@ -19,7 +19,7 @@ libhsakmt_headers =			\
 	fmm.h				\
 	libhsakmt.h			\
 	pmc_table.h			\
-	hsakmt.h			\
-	hsakmttypes.h			\
-	kfd_ioctl.h			\
+	include/hsakmt.h		\
+	include/hsakmttypes.h		\
+	include/linux/kfd_ioctl.h	\
 	$(NULL)

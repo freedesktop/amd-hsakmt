@@ -49,7 +49,7 @@ AC_PREREQ([2.57])
 
 m4_define([hsakmt_major], 1)
 m4_define([hsakmt_minor], 0)
-m4_define([hsakmt_micro], 0)
+m4_define([hsakmt_micro], 1)
 
 m4_define([hsakmt_version],[hsakmt_major.hsakmt_minor.hsakmt_micro])
 

@@ -66,6 +66,12 @@ AC_CANONICAL_HOST
 AC_PROG_AWK
 test_CFLAGS=${CFLAGS+set} # We may override autoconf default CFLAGS.
 AC_PROG_CC
+AC_PROG_CC_C99
+
+if test "x$ac_cv_prog_cc_c99" = xno; then
+	AC_MSG_ERROR([Building hsakmt requires C99 enabled compiler])
+fi
+
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL
 AC_PROG_MAKE_SET
